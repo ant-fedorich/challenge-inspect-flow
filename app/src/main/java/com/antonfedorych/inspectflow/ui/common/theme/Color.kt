@@ -1,4 +1,4 @@
-package com.antonfedorych.inspectflow.ui.theme
+package com.antonfedorych.inspectflow.ui.common.theme
 
 import androidx.compose.ui.graphics.Color
 
