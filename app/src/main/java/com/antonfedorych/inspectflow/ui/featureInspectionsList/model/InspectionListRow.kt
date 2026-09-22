@@ -1,0 +1,19 @@
+package com.antonfedorych.inspectflow.ui.featureInspectionsList.model
+
+import com.antonfedorych.inspectflow.domain.model.enum.ItemType
+
+data class ChoiceOptionRow(
+    val id: Int,
+    val label: String,
+)
+
+data class InspectionListRow(
+    val id: Int,
+    val type: ItemType,
+    val depth: Int,
+    val title: String? = null,
+    val content: String? = null,
+    val imageSrc: String? = null,
+    val multipleSelection: Boolean = false,
+    val choiceOptions: List<ChoiceOptionRow> = emptyList(),
+)
