@@ -1,0 +1,20 @@
+package com.antonfedorych.inspectflow.ui.featureInspectionsList
+
+import com.antonfedorych.inspectflow.ui.featureInspectionsList.uimodel.InspectionListRow
+
+data class InspectionListState(
+    val items: List<InspectionListRow> = emptyList(),
+    val selectedOptions: Map<Int, Set<Int>> = emptyMap(),
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
+)
+
+sealed interface InspectionListEvent {
+    data class ToggleOption(val questionId: Int, val optionId: Int) : InspectionListEvent
+    data class OpenImage(val title: String, val imageSrc: String) : InspectionListEvent
+}
+
+sealed interface InspectionListEffect {
+    data class NavigateToFullscreenImage(val title: String, val imageSrc: String) : InspectionListEffect
+    data class ShowError(val message: String) : InspectionListEffect
+}

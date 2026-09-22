@@ -1,4 +1,4 @@
-package com.antonfedorych.inspectflow.ui.featureInspectionsList.model
+package com.antonfedorych.inspectflow.ui.featureInspectionsList.uimodel
 
 import com.antonfedorych.inspectflow.domain.model.enum.ItemType
 

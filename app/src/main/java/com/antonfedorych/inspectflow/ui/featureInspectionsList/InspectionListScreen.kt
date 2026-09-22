@@ -1,0 +1,51 @@
+package com.antonfedorych.inspectflow.ui.featureInspectionsList
+
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.antonfedorych.inspectflow.ui.featureInspectionsList.InspectionListEffect.*
+import org.koin.compose.getKoin
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun InspectionListScreen(
+    onNavigateToFullscreenImage: () -> Unit
+) {
+    val viewmodel = getKoin().get<InspectionListViewModel>()
+    val state = viewmodel.state.collectAsState()
+
+    var showError by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        viewmodel.effect.collect {
+            when(it) {
+                is NavigateToFullscreenImage -> onNavigateToFullscreenImage()
+                is ShowError -> {
+                    showError = true
+                    errorMessage = it.message
+                }
+            }
+        }
+    }
+
+    if (showError) {
+        BasicAlertDialog(
+            onDismissRequest = { showError = false }
+        ) {
+            Text(errorMessage)
+        }
+    }
+
+    InspectionListScreenContent(
+        state = state.value,
+        onEvent = viewmodel::onEvent
+    )
+}
