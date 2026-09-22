@@ -24,8 +24,8 @@ class InspectionListViewModel(
     init {
         loadInspectionUseCase().onEach { result ->
             if (result is DataResult.Success)
-                _effect.send(InspectionListEffect.ShowError(result.toString()))
-//                _state.update { it.copy(errorMessage = result.toString()) }
+//                _effect.send(InspectionListEffect.ShowError(result.toString()))
+                _state.update { it.copy(items = result.value) }
         }.launchIn(viewModelScope)
     }
 
