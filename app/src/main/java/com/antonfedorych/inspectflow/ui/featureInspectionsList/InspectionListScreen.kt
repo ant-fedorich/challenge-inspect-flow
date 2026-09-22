@@ -2,6 +2,7 @@ package com.antonfedorych.inspectflow.ui.featureInspectionsList
 
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,7 +44,6 @@ fun InspectionListScreen(
             Text(errorMessage)
         }
     }
-
     InspectionListScreenContent(
         state = state.value,
         onEvent = viewmodel::onEvent

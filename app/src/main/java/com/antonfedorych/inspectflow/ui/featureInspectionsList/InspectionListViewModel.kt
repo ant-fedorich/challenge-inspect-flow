@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.antonfedorych.inspectflow.domain.model.state.DataResult
 import com.antonfedorych.inspectflow.domain.usecase.inspection.LoadInspectionUseCase
+import com.antonfedorych.inspectflow.ui.featureInspectionsList.mapper.toUIModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +25,7 @@ class InspectionListViewModel(
     init {
         loadInspectionUseCase().onEach { result ->
             if (result is DataResult.Success) {
-                _state.update { it.copy(items = result.value) }
+                _state.update { it.copy(items = result.value.toUIModel()) }
             }
         }.launchIn(viewModelScope)
     }

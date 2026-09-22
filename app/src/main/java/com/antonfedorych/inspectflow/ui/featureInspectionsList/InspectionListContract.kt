@@ -1,10 +1,9 @@
 package com.antonfedorych.inspectflow.ui.featureInspectionsList
 
-import com.antonfedorych.inspectflow.domain.model.Item
 import com.antonfedorych.inspectflow.ui.featureInspectionsList.uimodel.InspectionListRow
 
 data class InspectionListState(
-    val items: List<Item> = emptyList(),
+    val items: List<InspectionListRow> = emptyList(),
     val selectedOptions: Map<Int, Set<Int>> = emptyMap(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
