@@ -11,14 +11,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.antonfedorych.inspectflow.ui.featureInspectionsList.InspectionListEffect.*
-import org.koin.compose.getKoin
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InspectionListScreen(
     onNavigateToFullscreenImage: () -> Unit
 ) {
-    val viewmodel = getKoin().get<InspectionListViewModel>()
+    val viewmodel = koinViewModel<InspectionListViewModel>()
     val state = viewmodel.state.collectAsState()
 
     var showError by remember { mutableStateOf(false) }
@@ -26,7 +26,7 @@ fun InspectionListScreen(
 
     LaunchedEffect(Unit) {
         viewmodel.effect.collect {
-            when(it) {
+            when (it) {
                 is NavigateToFullscreenImage -> onNavigateToFullscreenImage()
                 is ShowError -> {
                     showError = true

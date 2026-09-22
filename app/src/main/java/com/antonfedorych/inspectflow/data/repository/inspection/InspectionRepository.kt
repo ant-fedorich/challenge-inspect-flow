@@ -20,10 +20,8 @@ class InspectionRepositoryImpl(
             val result = apiService.loadInspectionList().map { it.toDomain() }
             emit(DataResult.Success(result))
         } catch (e: Exception) {
-            println("InspectionRepositoryImpl: loadInspection: error: ${e.message}")
             emit(DataResult.Failure(e.message.orEmpty()))
         }
-
     }
 
     override suspend fun toggleOption(
