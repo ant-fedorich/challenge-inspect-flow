@@ -1,22 +1,14 @@
 package com.antonfedorych.inspectflow.app.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.antonfedorych.inspectflow.ui.featureInspectionsList.InspectionListScreen
 import kotlinx.serialization.Serializable
 
@@ -32,12 +24,14 @@ fun NavigationRoot(
             startDestination = Screen.InspectionList,
         ) {
             composable<Screen.InspectionList> {
-                InspectionListScreen {
-                    navController.navigate(Screen.ImagePreviewer)
+                InspectionListScreen { title, src ->
+                    navController.navigate(Screen.ImageViewer(title, src))
                 }
             }
 
-            composable<Screen.ImagePreviewer> {
+            composable<Screen.ImageViewer> {
+                val args = it.toRoute<Screen.ImageViewer>()
+
                 BasicAlertDialog(
                     onDismissRequest = {}
                 ) {
@@ -50,7 +44,7 @@ fun NavigationRoot(
 @Serializable
 object Screen {
     @Serializable
-    object InspectionList
+    data object InspectionList
     @Serializable
-    object ImagePreviewer
+    data class ImageViewer(val title: String, val imageSrc: String)
 }

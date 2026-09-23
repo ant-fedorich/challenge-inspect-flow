@@ -17,7 +17,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InspectionListScreen(
-    onNavigateToFullscreenImage: () -> Unit
+    onNavigateToFullscreenImage: (title: String, imageSrc: String) -> Unit
 ) {
     val viewmodel = koinViewModel<InspectionListViewModel>()
     val state = viewmodel.state.collectAsState()
@@ -28,7 +28,7 @@ fun InspectionListScreen(
     LaunchedEffect(Unit) {
         viewmodel.effect.collect {
             when (it) {
-                is NavigateToFullscreenImage -> onNavigateToFullscreenImage()
+                is NavigateToFullscreenImage -> onNavigateToFullscreenImage(it.title, it.imageSrc)
                 is ShowError -> {
                     showError = true
                     errorMessage = it.message
