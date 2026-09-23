@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.antonfedorych.inspectflow.data.local.InspectionDAO
 import com.antonfedorych.inspectflow.data.local.InspectionDatabase
 import com.antonfedorych.inspectflow.data.remote.ApiService
 import com.antonfedorych.inspectflow.data.repositoryModule
@@ -51,4 +52,6 @@ object InjectionHelper {
 
     fun provideRoomDB(context: Context): InspectionDatabase =
         Room.databaseBuilder(context, InspectionDatabase::class.java, "inspectflow.db").build()
+
+    fun provideInspectionDAO(room: InspectionDatabase): InspectionDAO = room.inspectionDao()
 }

@@ -1,5 +1,7 @@
 package com.antonfedorych.inspectflow.app.di
 
+import com.antonfedorych.inspectflow.data.local.InspectionDAO
+import com.antonfedorych.inspectflow.data.local.InspectionDatabase
 import org.koin.dsl.module
 
 private const val API_BASE_URL =
@@ -8,4 +10,6 @@ private const val API_BASE_URL =
 val appModule = module {
     single { InjectionHelper.provideRetrofitClient(API_BASE_URL) }
     single { InjectionHelper.provideAPIService(get()) }
+    single { InjectionHelper.provideRoomDB(get()) }
+    single { InjectionHelper.provideInspectionDAO(get()) }
 }

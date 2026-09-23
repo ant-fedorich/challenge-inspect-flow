@@ -5,5 +5,5 @@ import com.antonfedorych.inspectflow.domain.repository.InspectionRepository
 import org.koin.dsl.module
 
 val repositoryModule = module {
-    single<InspectionRepository> { InspectionRepositoryImpl(get()) }
+    single<InspectionRepository> { InspectionRepositoryImpl(get(), get()) }
 }
