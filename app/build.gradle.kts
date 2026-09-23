@@ -51,6 +51,8 @@ dependencies {
     implementation(libs.bundles.moshi)
     implementation(libs.bundles.kotlinx.serialization)
 
+    implementation(libs.bundles.coil)
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
