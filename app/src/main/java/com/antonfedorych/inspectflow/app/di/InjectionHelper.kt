@@ -1,6 +1,10 @@
 package com.antonfedorych.inspectflow.app.di
 
 import android.app.Application
+import android.content.Context
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import com.antonfedorych.inspectflow.data.local.InspectionDatabase
 import com.antonfedorych.inspectflow.data.remote.ApiService
 import com.antonfedorych.inspectflow.data.repositoryModule
 import com.antonfedorych.inspectflow.domain.useCaseModule
@@ -44,4 +48,7 @@ object InjectionHelper {
 
     fun provideAPIService(retrofit: Retrofit): ApiService =
         retrofit.create<ApiService>()
+
+    fun provideRoomDB(context: Context): InspectionDatabase =
+        Room.databaseBuilder(context, InspectionDatabase::class.java, "inspectflow.db").build()
 }
