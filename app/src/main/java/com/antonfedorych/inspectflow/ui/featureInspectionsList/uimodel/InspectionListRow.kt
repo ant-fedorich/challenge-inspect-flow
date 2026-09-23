@@ -5,6 +5,7 @@ import com.antonfedorych.inspectflow.domain.model.enum.ItemType
 data class ChoiceOptionRow(
     val id: Int,
     val label: String,
+    val score: Int? = null
 )
 
 data class InspectionListRow(

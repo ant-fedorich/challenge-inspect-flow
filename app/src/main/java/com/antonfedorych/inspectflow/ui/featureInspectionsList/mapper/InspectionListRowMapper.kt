@@ -36,7 +36,8 @@ fun ResponseSet.toUIModel(): List<ChoiceOptionRow> =
     this.responses.map {
         ChoiceOptionRow(
             id = it.id,
-            label = it.label
+            label = it.label,
+            score = it.score,
         )
     }
 
