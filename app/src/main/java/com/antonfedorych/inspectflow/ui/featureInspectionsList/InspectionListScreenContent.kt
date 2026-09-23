@@ -128,8 +128,15 @@ fun InspectionListScreenContent(
                                 ) {
                                     item.choiceOptions.forEach { option ->
                                         FilterChip(
-                                            selected = false,
-                                            onClick = {},
+                                            selected = option.isSelected,
+                                            onClick = {
+                                                onEvent(
+                                                    InspectionListEvent.ToggleOption(
+                                                        questionId = item.id,
+                                                        optionId = option.id
+                                                    )
+                                                )
+                                            },
                                             label = {
                                                 Text(text = option.label, style = MaterialTheme.typography.labelMedium)
                                             },

@@ -33,7 +33,38 @@ class InspectionListViewModel(
     fun onEvent(event: InspectionListEvent) {
         when (event) {
             is InspectionListEvent.OpenImage -> {}
-            is InspectionListEvent.ToggleOption -> {}
+            is InspectionListEvent.ToggleOption -> {
+                _state.update { current ->
+                    val ite = current.items.find { it.id == event.questionId }
+                    val op = ite?.choiceOptions?.find { it.id == event.optionId }
+                    if (ite == null || op == null) return@update current
+
+                    val newOp = op.copy(
+                        id = op.id,
+                        label = op.label,
+                        score = op.score,
+                        isSelected = !op.isSelected,
+                    )
+                    val newIte = ite.copy(
+                        id = ite.id,
+                        type = ite.type,
+                        depth = ite.depth,
+                        title = ite.title,
+                        content = ite.content,
+                        imageSrc = ite.imageSrc,
+                        multipleSelection = ite.multipleSelection,
+                        choiceOptions = ite.choiceOptions.map { option ->
+                            if (option.id == event.optionId) newOp else option
+                        },
+                    )
+
+                    current.copy(
+                        items = current.items.map { item ->
+                            if (item.id == event.questionId) newIte else item
+                        },
+                    )
+                }
+            }
         }
     }
 }

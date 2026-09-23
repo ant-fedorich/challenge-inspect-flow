@@ -4,7 +4,7 @@ import com.antonfedorych.inspectflow.ui.featureInspectionsList.uimodel.Inspectio
 
 data class InspectionListState(
     val items: List<InspectionListRow> = emptyList(),
-    val selectedOptions: Map<Int, Set<Int>> = emptyMap(),
+//    val selectedOptions: Map<Int, Set<Int>> = emptyMap(), //TODO Is it better to use for recomposition performance
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
 )
