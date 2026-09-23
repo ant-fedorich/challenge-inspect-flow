@@ -1,15 +1,14 @@
 package com.antonfedorych.inspectflow.app.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.antonfedorych.inspectflow.ui.featureInspectionsList.InspectionListScreen
+import com.antonfedorych.inspectflow.ui.featureInspectionsList.imageViewer.ImageViewerScreen
+import com.antonfedorych.inspectflow.ui.featureInspectionsList.inspectionList.InspectionListScreen
 import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -21,7 +20,7 @@ fun NavigationRoot(
 
         NavHost(
             navController = navController,
-            startDestination = Screen.InspectionList,
+            startDestination = Screen.InspectionList
         ) {
             composable<Screen.InspectionList> {
                 InspectionListScreen { title, src ->
@@ -31,12 +30,11 @@ fun NavigationRoot(
 
             composable<Screen.ImageViewer> {
                 val args = it.toRoute<Screen.ImageViewer>()
-
-                BasicAlertDialog(
-                    onDismissRequest = {}
-                ) {
-                    Text("Hello World")
-                }
+                ImageViewerScreen(
+                    title = args.title,
+                    imageSrc = args.imageSrc,
+                    onNavigateBack = { navController.popBackStack() },
+                )
             }
     }
 }

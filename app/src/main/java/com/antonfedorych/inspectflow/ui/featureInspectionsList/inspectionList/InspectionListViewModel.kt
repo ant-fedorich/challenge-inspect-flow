@@ -1,4 +1,4 @@
-package com.antonfedorych.inspectflow.ui.featureInspectionsList
+package com.antonfedorych.inspectflow.ui.featureInspectionsList.inspectionList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class InspectionListViewModel(
     private val loadInspectionUseCase: LoadInspectionUseCase
@@ -32,7 +33,16 @@ class InspectionListViewModel(
 
     fun onEvent(event: InspectionListEvent) {
         when (event) {
-            is InspectionListEvent.OpenImage -> {}
+            is InspectionListEvent.OpenImage -> {
+                viewModelScope.launch {
+                    _effect.send(
+                        InspectionListEffect.NavigateToFullscreenImage(
+                            title = event.title,
+                            imageSrc = event.imageSrc,
+                        ),
+                    )
+                }
+            }
             is InspectionListEvent.ToggleOption -> {
                 _state.update { current ->
                     val item = current.items.find { it.id == event.questionId }

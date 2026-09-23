@@ -1,4 +1,4 @@
-package com.antonfedorych.inspectflow.ui.featureInspectionsList
+package com.antonfedorych.inspectflow.ui.featureInspectionsList.inspectionList
 
 import com.antonfedorych.inspectflow.ui.featureInspectionsList.uimodel.InspectionListRow
 
