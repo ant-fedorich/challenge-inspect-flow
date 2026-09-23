@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface InspectionRepository {
     fun observeInspection(): Flow<List<Item>>
-    fun loadInspection(): Flow<DataResult<List<Item>>>
+    fun syncInspection(): Flow<DataResult<Unit>>
     suspend fun toggleOption(questionId: Int, optionId: Int): DataResult<Unit>
 }

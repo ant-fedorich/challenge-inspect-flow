@@ -4,41 +4,42 @@ import com.antonfedorych.inspectflow.data.local.InspectionDAO
 import com.antonfedorych.inspectflow.data.local.mapper.toDomainTree
 import com.antonfedorych.inspectflow.data.local.mapper.toEntity
 import com.antonfedorych.inspectflow.data.remote.ApiService
-import com.antonfedorych.inspectflow.data.remote.mapper.toDomain
 import com.antonfedorych.inspectflow.domain.model.Item
 import com.antonfedorych.inspectflow.domain.model.state.DataResult
 import com.antonfedorych.inspectflow.domain.repository.InspectionRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
+import kotlin.time.Duration.Companion.seconds
 
 class InspectionRepositoryImpl(
     private val apiService: ApiService,
-    private val db: InspectionDAO,
+    private val dao: InspectionDAO,
 ) : InspectionRepository {
-    override fun observeInspection(): Flow<List<Item>> = flow {
-    }
+    override fun observeInspection(): Flow<List<Item>> =
+        combine(
+            dao.getAllItems(),
+            dao.getAllResponseSets(),
+            dao.getAllResponses(),
+        ) { items, sets, responses ->
+            items.toDomainTree(sets, responses)
+        }
 
-    override fun loadInspection(): Flow<DataResult<List<Item>>> = flow {
+    override fun syncInspection(): Flow<DataResult<Unit>> = flow {
+        emit(DataResult.Loading)
+        delay(1.seconds)
         try {
             val result = apiService.loadInspectionList()
             val entityList = result.toEntity()
-            db.insertItems(entityList.items)
-            db.insertResponseSets(entityList.responseSets)
-            db.insertResponses(entityList.responses)
+            dao.insertItems(entityList.items)
+            dao.insertResponseSets(entityList.responseSets)
+            dao.insertResponses(entityList.responses)
+            // TODO: Add @Transaction?
 
-            combine(
-               db.getAllItems(),
-               db.getAllResponseSets(),
-               db.getAllResponses(),
-            ) { items, sets, responses ->
-               items.toDomainTree(sets, responses)
-            }.collect {
-               emit(DataResult.Success(it))
-            }
+            emit(DataResult.Success(Unit))
         } catch (e: Exception) {
+            // TODO: Handle Cancellation?
             emit(DataResult.Failure(e.message.orEmpty()))
         }
     }

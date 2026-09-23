@@ -8,5 +8,5 @@ import kotlinx.coroutines.flow.Flow
 class LoadInspectionUseCase(
     private val repo: InspectionRepository
 ) {
-    operator fun invoke(): Flow<DataResult<List<Item>>> = repo.loadInspection()
+    operator fun invoke(): Flow<DataResult<List<Item>>> = repo.syncInspection()
 }
