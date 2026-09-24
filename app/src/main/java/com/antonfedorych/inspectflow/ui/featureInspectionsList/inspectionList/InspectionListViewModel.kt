@@ -57,29 +57,17 @@ class InspectionListViewModel(
                 }
             }
             is InspectionListEvent.ToggleOption -> {
-                _state.update { current ->
-                    val item = current.items.find { it.id == event.questionId }
-                    val option = item?.choiceOptions?.find { it.id == event.optionId }
-                    if (item == null || option == null) return@update current
+                _state.update {
+                    val item = it.items.find { it.id == event.questionId } ?: return@update it
+                    val selected = it.selectedOptions[event.questionId].orEmpty()
+                    val newSelected = when {
+                        event.optionId in selected -> selected - event.optionId
+                        item.multipleSelection -> selected + event.optionId
+                        else -> setOf(event.optionId)
+                    }
+                    val selectedOptions = it.selectedOptions + (event.questionId to newSelected)
 
-                    val newOption = option.copy(isSelected = !option.isSelected,)
-                    val newItem = item.copy(
-                        choiceOptions = item.choiceOptions.map { option ->
-                            if (option.id == event.optionId)
-                                newOption
-                            else if (!item.multipleSelection)
-                                option.copy(isSelected = false)
-                            else
-                                option
-
-                        },
-                    )
-
-                    current.copy(
-                        items = current.items.map { item ->
-                            if (item.id == event.questionId) newItem else item
-                        },
-                    )
+                    it.copy(selectedOptions = selectedOptions)
                 }
             }
         }

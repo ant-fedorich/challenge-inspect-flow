@@ -84,6 +84,7 @@ fun InspectionListScreenContent(
                     key = { it.id },
                     contentType = { it.type }
                 ) { item ->
+                    val selectedOptionIds = state.selectedOptions[item.id].orEmpty()
                     when (item.type) {
                         PAGE -> {
                             Row(
@@ -188,7 +189,7 @@ fun InspectionListScreenContent(
                                     ) {
                                         item.choiceOptions.forEach { option ->
                                             FilterChip(
-                                                selected = option.isSelected,
+                                                selected = option.id in selectedOptionIds,
                                                 onClick = {
                                                     onEvent(
                                                         InspectionListEvent.ToggleOption(
@@ -212,8 +213,8 @@ fun InspectionListScreenContent(
                                     }
                                     val isSelectedText = if (item.multipleSelection) "multi-select" else "single-select"
 
-                                    val selectedText = if (item.choiceOptions.all { !it.isSelected }) "none"
-                                    else item.choiceOptions.count { it.isSelected }.toString()
+                                    val selectedText = if (selectedOptionIds.isEmpty()) "none"
+                                    else selectedOptionIds.size.toString()
 
 
                                     Text(text = "$selectedText selected ($isSelectedText)", style = MaterialTheme.typography.labelSmall)

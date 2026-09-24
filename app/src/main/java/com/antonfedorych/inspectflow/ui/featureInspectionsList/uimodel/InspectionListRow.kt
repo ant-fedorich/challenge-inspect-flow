@@ -6,7 +6,6 @@ data class ChoiceOptionRow(
     val id: Int,
     val label: String,
     val score: Int? = null,
-    val isSelected: Boolean = false
 )
 
 data class InspectionListRow(

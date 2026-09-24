@@ -10,9 +10,8 @@ Native Android app for the coding challenge: fetch inspection JSON, show hierarc
 
 
 ## Non-functional requirements
-1. (check client requirement) System must support endless-depth section nesting (sections containing sections, without a fixed level limit), for: parse from API, save in DB, render in Compose.
+1. System must support nested sections with endless depth (sections containing sections, without a fixed level limit) for: parsed from API, saved in DB, rendered in Compose.
 2. System must work in offline mode, i.e. save previously fetched data, using relational DB.
-3. (check client requirement) System must cache selected responses (user choices on choice questions) in the relational DB so selections survive offline use.
 4. (optional) System must handle network failures with providing a fallback mechanism for poor connections
 5. (optional) System must include automated tests for important behavior
 
