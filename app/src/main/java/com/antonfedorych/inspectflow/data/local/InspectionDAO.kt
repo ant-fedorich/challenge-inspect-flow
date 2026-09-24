@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.antonfedorych.inspectflow.data.local.entity.ItemEntity
 import com.antonfedorych.inspectflow.data.local.entity.ResponseEntity
 import com.antonfedorych.inspectflow.data.local.entity.ResponseSetEntity
@@ -28,4 +29,16 @@ interface InspectionDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertResponses(responses: List<ResponseEntity>)
+
+    //Without Transaction, Flow combine() could emit several times on several Inserts
+    @Transaction
+    suspend fun insertInspectionTransaction(
+        items: List<ItemEntity>,
+        sets: List<ResponseSetEntity>,
+        responses: List<ResponseEntity>
+    ) {
+        insertItems(items)
+        insertResponseSets(sets)
+        insertResponses(responses)
+    }
 }

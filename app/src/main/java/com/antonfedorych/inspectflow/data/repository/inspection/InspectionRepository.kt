@@ -7,6 +7,7 @@ import com.antonfedorych.inspectflow.data.remote.ApiService
 import com.antonfedorych.inspectflow.domain.model.Item
 import com.antonfedorych.inspectflow.domain.model.state.DataResult
 import com.antonfedorych.inspectflow.domain.repository.InspectionRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -28,19 +29,19 @@ class InspectionRepositoryImpl(
 
     override fun refreshInspection(): Flow<DataResult<Unit>> = flow {
         emit(DataResult.Loading)
-        delay(5.seconds) //testing backend delay
+        delay(1.seconds) //testing backend delay
         try {
             val result = apiService.loadInspectionList()
             val entityList = result.toEntity()
-            dao.insertItems(entityList.items)
-            dao.insertResponseSets(entityList.responseSets)
-            dao.insertResponses(entityList.responses)
-            // TODO: Add @Transaction?
-
-//            emit(DataResult.Failure("Error"))
+            dao.insertInspectionTransaction(
+                entityList.items,
+                entityList.responseSets,
+                entityList.responses
+            )
             emit(DataResult.Success(Unit))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            // TODO: Handle Cancellation?
             emit(DataResult.Failure(e.message.orEmpty()))
         }
     }

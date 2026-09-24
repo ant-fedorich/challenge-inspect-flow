@@ -57,7 +57,10 @@ Native Android app for the coding challenge: fetch inspection JSON, show hierarc
 3. (option?) Multimodule - single module + sctucture similar to multimodule (easier to migrate to multi-module) vs multi-module (overengineered in this task)
 4. Showing nested items in UI - Flatten items with depth prop (long scrollable list) in LazyList vs nested LazyLists (recursive nested scoll problem) vs recursive nested Compose (problem with long list) without LazyLists
 5. MVI vs pure MVVM
-6. Do not cash option selection VS cash option selection 
+6. Do not cash option selection VS cash option selection
+7. ?Conbine table with Flow conbine() VS not via SQL JOIN, because JOIN would duplicate rows for choice responses i.e. returns dublicated objects to Kotlin.
+
+
 
 ## Risks
 1. Flatten items with depth prop (long scrollable list) for showing nested items in UI - harder to implement collapsing, paginating (depends on a real requirement, amount)

@@ -10,6 +10,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -26,9 +27,10 @@ class InspectionListViewModel(
     val effect = _effect.receiveAsFlow()
 
     init {
-        refreshInspectionUseCase().onEach { result ->
-            handleRefreshResult(result)
-        }.launchIn(viewModelScope)
+        refreshInspectionUseCase()
+            .onEach { handleRefreshResult(it) }
+            .onCompletion { _state.update { it.copy(isLoading = false) } }
+            .launchIn(viewModelScope)
 
         observeInspectionUseCase().onEach { list ->
             _state.update { it.copy(items = list.toUIModel()) }
@@ -38,11 +40,10 @@ class InspectionListViewModel(
     fun onEvent(event: InspectionListEvent) {
         when (event) {
             is InspectionListEvent.RefreshItems -> {
-                refreshInspectionUseCase().onEach { result ->
-                    handleRefreshResult(result)
-
-                }.launchIn(viewModelScope)
-                _state.update { it.copy(isLoading = true) }
+                refreshInspectionUseCase()
+                    .onEach { handleRefreshResult(it) }
+                    .onCompletion { _state.update { it.copy(isLoading = false) } }
+                    .launchIn(viewModelScope)
             }
 
             is InspectionListEvent.OpenImage -> {
@@ -88,12 +89,10 @@ class InspectionListViewModel(
         when (result) {
             is DataResult.Loading -> _state.update { it.copy(isLoading = true) }
             is DataResult.Failure -> {
-                _state.update { it.copy(isLoading = false) }
                 _effect.send(InspectionListEffect.ShowError(result.message))
             }
 
             is DataResult.Success -> {
-                _state.update { it.copy(isLoading = false) }
                 _effect.send(InspectionListEffect.ShowSuccessRefresh)
             }
         }
