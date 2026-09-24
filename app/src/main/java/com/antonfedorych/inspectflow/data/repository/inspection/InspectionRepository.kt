@@ -28,7 +28,7 @@ class InspectionRepositoryImpl(
 
     override fun refreshInspection(): Flow<DataResult<Unit>> = flow {
         emit(DataResult.Loading)
-        delay(1.seconds) //testing backend delay
+        delay(5.seconds) //testing backend delay
         try {
             val result = apiService.loadInspectionList()
             val entityList = result.toEntity()

@@ -10,11 +10,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.outlined.Error
+import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
@@ -23,7 +31,15 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.remember
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -35,6 +51,8 @@ import com.antonfedorych.inspectflow.domain.model.enum.ItemType.IMAGE
 import com.antonfedorych.inspectflow.domain.model.enum.ItemType.PAGE
 import com.antonfedorych.inspectflow.domain.model.enum.ItemType.SECTION
 import com.antonfedorych.inspectflow.domain.model.enum.ItemType.TEXT
+
+// TODO: Crash on first loading from api
 
 @Composable
 fun InspectionListScreenContent(
@@ -127,10 +145,20 @@ fun InspectionListScreenContent(
                                 Column {
                                     AsyncImage(
                                         model = item.imageSrc,
-                                        contentDescription = null,
-                                        modifier = Modifier.clickable {
-                                            onEvent(InspectionListEvent.OpenImage(item.title.orEmpty(), item.imageSrc.orEmpty()))
-                                        }
+                                        contentDescription = item.title,
+                                        modifier = Modifier
+                                            .height(140.dp)
+                                            .clickable {
+                                                onEvent(
+                                                    InspectionListEvent.OpenImage(
+                                                        item.title.orEmpty(),
+                                                        item.imageSrc.orEmpty(),
+                                                    ),
+                                                )
+                                            },
+                                        contentScale = ContentScale.Fit,
+                                        placeholder = rememberVectorPainter(image = Icons.Outlined.Image),
+                                        error = rememberVectorPainter(Icons.Outlined.ErrorOutline)
                                     )
                                     Row{
                                         Text(text = item.title.orEmpty(), style = MaterialTheme.typography.labelMedium)
