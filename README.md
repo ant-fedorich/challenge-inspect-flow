@@ -1,9 +1,7 @@
 # InspectFlow
-
 Native Android app for the coding challenge: fetch inspection JSON, show hierarchical Pages/Sections/Questions, offline cache, choice and image.
 
 ## Functional requirements
-
 1. User can see the visually structured content that comes from a backend: hierarchical Pages/Sections/Questions. Questions use one of three types: text, image, choice
 2. User can answer choice questions. The app allows one or many selections depending on the question settings..
 3. User can see a reduced-size preview of the image when an image question is presented.
@@ -12,17 +10,13 @@ Native Android app for the coding challenge: fetch inspection JSON, show hierarc
 
 
 ## Non-functional requirements
-
 1. (check client requirement) System must support endless-depth section nesting (sections containing sections, without a fixed level limit), for: parse from API, save in DB, render in Compose.
 2. System must work in offline mode, i.e. save previously fetched data, using relational DB.
 3. (check client requirement) System must cache selected responses (user choices on choice questions) in the relational DB so selections survive offline use.
 4. (optional) System must handle network failures with providing a fallback mechanism for poor connections
 5. (optional) System must include automated tests for important behavior
 
-
-
 ## Data flow
-
 ```
 1. API
    ↓
@@ -43,20 +37,14 @@ Native Android app for the coding challenge: fetch inspection JSON, show hierarc
 5. UI - LazyColumn
 ```
 
-
-
 ## Techstack
-
 - **Language:** Kotlin
 - **UI:** Jetpack Compose (Material 3)
 - **Networking:** Retrofit
 - **Local storage:** Room
 - **DI:** Koin
 
-
-
 ## Architecture
-
 - **Modules:** single-module app (`:app` only)
 - **Style:** Clean Architecture
   - **presentation** — Compose UI, ViewModel (MVI)
@@ -68,6 +56,14 @@ Native Android app for the coding challenge: fetch inspection JSON, show hierarc
 2. Endless depth of nodes in the tree - flatten one table in DB (can handle endless nodes depth) vs nested DB entites like domain models (does not handle endless nodes depth)
 3. (option?) Multimodule - single module + sctucture similar to multimodule (easier to migrate to multi-module) vs multi-module (overengineered in this task)
 4. Showing nested items in UI - Flatten items with depth prop (long scrollable list) in LazyList vs nested LazyLists (recursive nested scoll problem) vs recursive nested Compose (problem with long list) without LazyLists
+5. MVI vs pure MVVM
+6. Do not cash option selection VS cash option selection 
 
 ## Risks
 1. Flatten items with depth prop (long scrollable list) for showing nested items in UI - harder to implement collapsing, paginating (depends on a real requirement, amount)
+
+## TODO
+- WorkManager for Retry
+- Collapsing Lists for nested items
+- Observe Internet connection with message
+

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
@@ -25,8 +24,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.antonfedorych.inspectflow.domain.model.enum.ItemType.CHOICE
 import com.antonfedorych.inspectflow.domain.model.enum.ItemType.IMAGE
@@ -73,7 +75,12 @@ fun InspectionListScreenContent(
                                     .background(Color.Gray.copy(0.4f), shape = ShapeDefaults.Medium)
                                     .padding(24.dp)
                             ) {
-                                Text(text = item.title.orEmpty(), style = MaterialTheme.typography.titleLarge)
+                                Text(
+                                    text = item.title.orEmpty(),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = Color.Red.copy(0.4f)
+                                )
                                 Spacer(Modifier.width(8.dp))
                                 Text(text = "#" + item.id, style = MaterialTheme.typography.labelLarge)
                             }
@@ -86,7 +93,12 @@ fun InspectionListScreenContent(
                                     .background(Color.Gray.copy(0.4f), shape = ShapeDefaults.Medium)
                                     .padding(24.dp)
                             ) {
-                                Text(text = item.title.orEmpty(), style = MaterialTheme.typography.titleMedium)
+                                Text(
+                                    text = item.title.orEmpty(),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = sectionFontSize(item.depth),
+                                )
                                 Spacer(Modifier.width(8.dp))
                                 Text(text = "#" + item.id, style = MaterialTheme.typography.labelLarge)
                             }
@@ -138,7 +150,7 @@ fun InspectionListScreenContent(
                             ){
                                 Column {
                                     Row{
-                                        Text(text = item.content.orEmpty(), style = MaterialTheme.typography.bodySmall)
+                                        Text(text = item.content.orEmpty(), style = MaterialTheme.typography.bodyMedium)
                                         Spacer(Modifier.width(8.dp))
                                         Text(text = "#" + item.id, style = MaterialTheme.typography.labelLarge)
                                     }
@@ -158,7 +170,7 @@ fun InspectionListScreenContent(
                                                     )
                                                 },
                                                 label = {
-                                                    Text(text = option.label, style = MaterialTheme.typography.labelMedium)
+                                                    Text(text = option.label, style = MaterialTheme.typography.labelSmall)
                                                 },
                                                 trailingIcon = {
                                                     option.score?.let {
@@ -176,16 +188,22 @@ fun InspectionListScreenContent(
                                     else item.choiceOptions.count { it.isSelected }.toString()
 
 
-                                    Text(text = "$selectedText selected ($isSelectedText)")
+                                    Text(text = "$selectedText selected ($isSelectedText)", style = MaterialTheme.typography.labelSmall)
                                 }
                             }
                         }
                     }
                 }
             }
-//            if (state.isLoading) CircularProgressIndicator()
         }
     }
+}
+
+@Composable
+private fun sectionFontSize(depth: Int): TextUnit {
+    val max = MaterialTheme.typography.titleLarge.fontSize.value - 2
+    val min = MaterialTheme.typography.bodyMedium.fontSize.value + 2
+    return (max - 2 * (depth - 1)).coerceIn(min, max).sp
 }
 
 @Preview
