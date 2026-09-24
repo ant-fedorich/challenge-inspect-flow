@@ -3,7 +3,8 @@ package com.antonfedorych.inspectflow.ui.featureInspectionsList.inspectionList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.antonfedorych.inspectflow.domain.model.state.DataResult
-import com.antonfedorych.inspectflow.domain.usecase.inspection.LoadInspectionUseCase
+import com.antonfedorych.inspectflow.domain.usecase.inspection.ObserveInspectionUseCase
+import com.antonfedorych.inspectflow.domain.usecase.inspection.RefreshInspectionUseCase
 import com.antonfedorych.inspectflow.ui.featureInspectionsList.mapper.toUIModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +16,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class InspectionListViewModel(
-    private val loadInspectionUseCase: LoadInspectionUseCase
+    private val observeInspectionUseCase: ObserveInspectionUseCase,
+    private val refreshInspectionUseCase: RefreshInspectionUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(InspectionListState())
     val state = _state.asStateFlow()
@@ -24,10 +26,23 @@ class InspectionListViewModel(
     val effect = _effect.receiveAsFlow()
 
     init {
-        loadInspectionUseCase().onEach { result ->
-            if (result is DataResult.Success) {
-                _state.update { it.copy(items = result.value.toUIModel()) }
+        refreshInspectionUseCase().onEach { result ->
+            when(result) {
+                is DataResult.Loading -> _state.update { it.copy(isLoading = true) }
+                is DataResult.Failure -> {
+                    _state.update { it.copy(isLoading = false) }
+                    _effect.send(InspectionListEffect.ShowError(result.message))
+                }
+                is DataResult.Success -> {
+                    _state.update { it.copy(isLoading = false) }
+                    _effect.send(InspectionListEffect.ShowSuccessRefresh)
+                }
             }
+
+        }.launchIn(viewModelScope)
+
+        observeInspectionUseCase().onEach { list ->
+            _state.update { it.copy(items = list.toUIModel()) }
         }.launchIn(viewModelScope)
     }
 

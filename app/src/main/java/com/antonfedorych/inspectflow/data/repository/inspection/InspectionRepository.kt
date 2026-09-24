@@ -26,9 +26,9 @@ class InspectionRepositoryImpl(
             items.toDomainTree(sets, responses)
         }
 
-    override fun syncInspection(): Flow<DataResult<Unit>> = flow {
+    override fun refreshInspection(): Flow<DataResult<Unit>> = flow {
         emit(DataResult.Loading)
-        delay(1.seconds)
+        delay(1.seconds) //testing backend delay
         try {
             val result = apiService.loadInspectionList()
             val entityList = result.toEntity()
@@ -37,6 +37,7 @@ class InspectionRepositoryImpl(
             dao.insertResponses(entityList.responses)
             // TODO: Add @Transaction?
 
+//            emit(DataResult.Failure("Error"))
             emit(DataResult.Success(Unit))
         } catch (e: Exception) {
             // TODO: Handle Cancellation?

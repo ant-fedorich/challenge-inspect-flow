@@ -15,11 +15,13 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,132 +45,140 @@ fun InspectionListScreenContent(
             .padding(horizontal = 20.dp)
             .padding(vertical = 24.dp)
     ) {
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+            ,
+            contentAlignment = Alignment.Center
         ) {
-            items(
-                items = state.items,
-                key = { it.id },
-                contentType = { it.type }
-            ) { item ->
-                when (item.type) {
-                    PAGE -> {
-                        Row(
-                            Modifier
-                                .padding(start = 24.dp * item.depth)
-                                .fillMaxWidth()
-                                .background(Color.Gray.copy(0.4f), shape = ShapeDefaults.Medium)
-                                .padding(24.dp)
-                        ) {
-                            Text(text = item.title.orEmpty(), style = MaterialTheme.typography.titleLarge)
-                            Spacer(Modifier.width(8.dp))
-                            Text(text = "#" + item.id, style = MaterialTheme.typography.labelLarge)
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(
+                    items = state.items,
+                    key = { it.id },
+                    contentType = { it.type }
+                ) { item ->
+                    when (item.type) {
+                        PAGE -> {
+                            Row(
+                                Modifier
+                                    .padding(start = 24.dp * item.depth)
+                                    .fillMaxWidth()
+                                    .background(Color.Gray.copy(0.4f), shape = ShapeDefaults.Medium)
+                                    .padding(24.dp)
+                            ) {
+                                Text(text = item.title.orEmpty(), style = MaterialTheme.typography.titleLarge)
+                                Spacer(Modifier.width(8.dp))
+                                Text(text = "#" + item.id, style = MaterialTheme.typography.labelLarge)
+                            }
                         }
-                    }
-                    SECTION -> {
-                        Row(
-                            Modifier
-                                .padding(start = 24.dp * item.depth)
-                                .fillMaxWidth()
-                                .background(Color.Gray.copy(0.4f), shape = ShapeDefaults.Medium)
-                                .padding(24.dp)
-                        ) {
-                            Text(text = item.title.orEmpty(), style = MaterialTheme.typography.titleMedium)
-                            Spacer(Modifier.width(8.dp))
-                            Text(text = "#" + item.id, style = MaterialTheme.typography.labelLarge)
+                        SECTION -> {
+                            Row(
+                                Modifier
+                                    .padding(start = 24.dp * item.depth)
+                                    .fillMaxWidth()
+                                    .background(Color.Gray.copy(0.4f), shape = ShapeDefaults.Medium)
+                                    .padding(24.dp)
+                            ) {
+                                Text(text = item.title.orEmpty(), style = MaterialTheme.typography.titleMedium)
+                                Spacer(Modifier.width(8.dp))
+                                Text(text = "#" + item.id, style = MaterialTheme.typography.labelLarge)
+                            }
                         }
-                    }
-                    TEXT -> {
-                        Row(
-                            Modifier
-                                .padding(start = 24.dp * item.depth)
-                                .fillMaxWidth()
-                                .background(Color.Gray.copy(0.4f), shape = ShapeDefaults.Medium)
-                                .padding(24.dp)
-                        ) {
-                            Text(text = item.content.orEmpty(), style = MaterialTheme.typography.bodyMedium)
-                            Spacer(Modifier.width(8.dp))
-                            Text(text = "#" + item.id, style = MaterialTheme.typography.labelLarge)
+                        TEXT -> {
+                            Row(
+                                Modifier
+                                    .padding(start = 24.dp * item.depth)
+                                    .fillMaxWidth()
+                                    .background(Color.Gray.copy(0.4f), shape = ShapeDefaults.Medium)
+                                    .padding(24.dp)
+                            ) {
+                                Text(text = item.content.orEmpty(), style = MaterialTheme.typography.bodyMedium)
+                                Spacer(Modifier.width(8.dp))
+                                Text(text = "#" + item.id, style = MaterialTheme.typography.labelLarge)
+                            }
                         }
-                    }
-                    IMAGE -> {
-                        Box(
-                            Modifier
-                                .padding(start = 24.dp * item.depth)
-                                .fillMaxWidth()
-                                .background(Color.Gray.copy(0.4f), shape = ShapeDefaults.Medium)
-                                .padding(24.dp)
-                        ){
-                            Column {
-                                AsyncImage(
-                                    model = item.imageSrc,
-                                    contentDescription = null,
-                                    modifier = Modifier.clickable {
-                                        onEvent(InspectionListEvent.OpenImage(item.title.orEmpty(), item.imageSrc.orEmpty()))
+                        IMAGE -> {
+                            Box(
+                                Modifier
+                                    .padding(start = 24.dp * item.depth)
+                                    .fillMaxWidth()
+                                    .background(Color.Gray.copy(0.4f), shape = ShapeDefaults.Medium)
+                                    .padding(24.dp)
+                            ){
+                                Column {
+                                    AsyncImage(
+                                        model = item.imageSrc,
+                                        contentDescription = null,
+                                        modifier = Modifier.clickable {
+                                            onEvent(InspectionListEvent.OpenImage(item.title.orEmpty(), item.imageSrc.orEmpty()))
+                                        }
+                                    )
+                                    Row{
+                                        Text(text = item.title.orEmpty(), style = MaterialTheme.typography.labelMedium)
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(text = "#" + item.id, style = MaterialTheme.typography.labelLarge)
                                     }
-                                )
-                                Row{
-                                    Text(text = item.title.orEmpty(), style = MaterialTheme.typography.labelMedium)
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(text = "#" + item.id, style = MaterialTheme.typography.labelLarge)
                                 }
                             }
                         }
-                    }
-                    CHOICE -> {
-                        Box(
-                            Modifier
-                                .padding(start = 24.dp * item.depth)
-                                .fillMaxWidth()
-                                .background(Color.Gray.copy(0.4f), shape = ShapeDefaults.Medium)
-                                .padding(24.dp)
-                        ){
-                            Column {
-                                Row{
-                                    Text(text = item.content.orEmpty(), style = MaterialTheme.typography.bodySmall)
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(text = "#" + item.id, style = MaterialTheme.typography.labelLarge)
-                                }
-
-                                FlowRow(
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    item.choiceOptions.forEach { option ->
-                                        FilterChip(
-                                            selected = option.isSelected,
-                                            onClick = {
-                                                onEvent(
-                                                    InspectionListEvent.ToggleOption(
-                                                        questionId = item.id,
-                                                        optionId = option.id
-                                                    )
-                                                )
-                                            },
-                                            label = {
-                                                Text(text = option.label, style = MaterialTheme.typography.labelMedium)
-                                            },
-                                            trailingIcon = {
-                                                option.score?.let {
-                                                    Text(
-                                                        it.toString()
-                                                    )
-                                                }
-                                            }
-                                        )
+                        CHOICE -> {
+                            Box(
+                                Modifier
+                                    .padding(start = 24.dp * item.depth)
+                                    .fillMaxWidth()
+                                    .background(Color.Gray.copy(0.4f), shape = ShapeDefaults.Medium)
+                                    .padding(24.dp)
+                            ){
+                                Column {
+                                    Row{
+                                        Text(text = item.content.orEmpty(), style = MaterialTheme.typography.bodySmall)
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(text = "#" + item.id, style = MaterialTheme.typography.labelLarge)
                                     }
-                                }
-                                val isSelectedText = if (item.multipleSelection) "multi-select" else "single-select"
 
-                                val selectedText = if (item.choiceOptions.all { !it.isSelected }) "none"
+                                    FlowRow(
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    ) {
+                                        item.choiceOptions.forEach { option ->
+                                            FilterChip(
+                                                selected = option.isSelected,
+                                                onClick = {
+                                                    onEvent(
+                                                        InspectionListEvent.ToggleOption(
+                                                            questionId = item.id,
+                                                            optionId = option.id
+                                                        )
+                                                    )
+                                                },
+                                                label = {
+                                                    Text(text = option.label, style = MaterialTheme.typography.labelMedium)
+                                                },
+                                                trailingIcon = {
+                                                    option.score?.let {
+                                                        Text(
+                                                            it.toString()
+                                                        )
+                                                    }
+                                                }
+                                            )
+                                        }
+                                    }
+                                    val isSelectedText = if (item.multipleSelection) "multi-select" else "single-select"
+
+                                    val selectedText = if (item.choiceOptions.all { !it.isSelected }) "none"
                                     else item.choiceOptions.count { it.isSelected }.toString()
 
 
-                                Text(text = "$selectedText selected ($isSelectedText)")
+                                    Text(text = "$selectedText selected ($isSelectedText)")
+                                }
                             }
                         }
                     }
                 }
             }
+            if (state.isLoading) CircularProgressIndicator()
         }
     }
 }
