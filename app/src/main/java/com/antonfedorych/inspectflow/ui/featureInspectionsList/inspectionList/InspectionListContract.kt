@@ -11,6 +11,7 @@ data class InspectionListState(
 )
 
 sealed interface InspectionListEvent {
+    data object RefreshItems : InspectionListEvent
     data class ToggleOption(val questionId: Int, val optionId: Int) : InspectionListEvent
     data class OpenImage(val title: String, val imageSrc: String) : InspectionListEvent
 }

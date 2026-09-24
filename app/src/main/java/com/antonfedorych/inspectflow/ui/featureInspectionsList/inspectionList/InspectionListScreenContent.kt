@@ -20,6 +20,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +39,11 @@ fun InspectionListScreenContent(
     state: InspectionListState = InspectionListState(),
     onEvent: (InspectionListEvent) -> Unit = {}
 ) {
-    Box(
+    PullToRefreshBox(
+        isRefreshing = state.isLoading,
+        onRefresh = {
+            onEvent(InspectionListEvent.RefreshItems)
+        },
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
@@ -178,7 +183,7 @@ fun InspectionListScreenContent(
                     }
                 }
             }
-            if (state.isLoading) CircularProgressIndicator()
+//            if (state.isLoading) CircularProgressIndicator()
         }
     }
 }

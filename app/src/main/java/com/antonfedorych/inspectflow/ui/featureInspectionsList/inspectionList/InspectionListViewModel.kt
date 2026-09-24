@@ -27,18 +27,7 @@ class InspectionListViewModel(
 
     init {
         refreshInspectionUseCase().onEach { result ->
-            when(result) {
-                is DataResult.Loading -> _state.update { it.copy(isLoading = true) }
-                is DataResult.Failure -> {
-                    _state.update { it.copy(isLoading = false) }
-                    _effect.send(InspectionListEffect.ShowError(result.message))
-                }
-                is DataResult.Success -> {
-                    _state.update { it.copy(isLoading = false) }
-                    _effect.send(InspectionListEffect.ShowSuccessRefresh)
-                }
-            }
-
+            handleRefreshResult(result)
         }.launchIn(viewModelScope)
 
         observeInspectionUseCase().onEach { list ->
@@ -48,6 +37,14 @@ class InspectionListViewModel(
 
     fun onEvent(event: InspectionListEvent) {
         when (event) {
+            is InspectionListEvent.RefreshItems -> {
+                refreshInspectionUseCase().onEach { result ->
+                    handleRefreshResult(result)
+
+                }.launchIn(viewModelScope)
+                _state.update { it.copy(isLoading = true) }
+            }
+
             is InspectionListEvent.OpenImage -> {
                 viewModelScope.launch {
                     _effect.send(
@@ -83,6 +80,21 @@ class InspectionListViewModel(
                         },
                     )
                 }
+            }
+        }
+    }
+
+    private suspend fun handleRefreshResult(result: DataResult<Unit>) {
+        when (result) {
+            is DataResult.Loading -> _state.update { it.copy(isLoading = true) }
+            is DataResult.Failure -> {
+                _state.update { it.copy(isLoading = false) }
+                _effect.send(InspectionListEffect.ShowError(result.message))
+            }
+
+            is DataResult.Success -> {
+                _state.update { it.copy(isLoading = false) }
+                _effect.send(InspectionListEffect.ShowSuccessRefresh)
             }
         }
     }
