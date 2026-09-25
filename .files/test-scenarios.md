@@ -6,7 +6,7 @@ One numbered item = one test. Bullets are Given/When/Then (+ And).
 Source for generating tests. Each test name must match the scenario title.
 
 ## Scenarios
-##### FR1 / NFR1 - Hierarchy and unlimited nesting (mappers)
+##### FR1 / NFR1 - Hierarchy and potentially unbounded nesting (mappers)
 1. **T1 - deep nesting should keep its shape from DTO to domain**
   - Given a page -> nested sections -> text question with nesting depth 10
   - When mapped DTO -> Entity -> Domain

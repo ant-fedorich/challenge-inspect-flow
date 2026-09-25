@@ -101,6 +101,4 @@ class InspectionListViewModelTest {
 private class FakeInspectionRepository(private val items: List<Item>) : InspectionRepository {
     override fun observeInspection(): Flow<List<Item>> = flowOf(items)
     override fun refreshInspection(): Flow<DataResult<Unit>> = emptyFlow()
-    override suspend fun toggleOption(questionId: Int, optionId: Int): DataResult<Unit> =
-        DataResult.Success(Unit)
 }

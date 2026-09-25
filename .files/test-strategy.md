@@ -9,7 +9,7 @@ Test scenarios: `test-scenarios.md`.
 
 ## Requirements → Tests
 - FR1
-  - **Behavior:** Unlimited nesting survives DTO -> Entity -> Domain
+  - **Behavior:** Potentially unbounded nesting survives DTO -> Entity -> Domain
     - **Test:** T1
   - **Behavior:** Flattened rows with correct depth
     - **Test:** T2
@@ -24,7 +24,7 @@ Test scenarios: `test-scenarios.md`.
   - **Behavior:** Tapping an image sends OpenImage with title and source
     - **Test:** T8
 - NFR1
-  - **Behavior:** Unlimited nesting survives DTO -> Entity -> Domain
+  - **Behavior:** Potentially unbounded nesting survives DTO -> Entity -> Domain
     - **Test:** T1
 - NFR2
   - **Behavior:** Successful refresh shows the new tree
@@ -37,7 +37,7 @@ Test scenarios: `test-scenarios.md`.
 
 ## Test levels
 - Unit: 2
-- Integration: 5
+- Integration (test doubles): 5
 - UI: 1
 
 ## Tooling
@@ -66,7 +66,7 @@ class SubjectTest {
 }
 ```
 
-## Out of scope
+## Scope boundaries
 - Font sizes and layout - visual only; `type` and `depth` are covered by mapper tests.
 - Reduced-size image preview (FR3) - visual only; rendering is done by Coil.
 - Use cases - pass-through to the repository; covered via ViewModel tests.

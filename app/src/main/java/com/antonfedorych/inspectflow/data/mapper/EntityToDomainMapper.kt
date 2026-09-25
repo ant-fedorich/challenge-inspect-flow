@@ -1,4 +1,4 @@
-package com.antonfedorych.inspectflow.data.local.mapper
+package com.antonfedorych.inspectflow.data.mapper
 
 import com.antonfedorych.inspectflow.data.local.entity.ItemEntity
 import com.antonfedorych.inspectflow.data.local.entity.ResponseEntity
