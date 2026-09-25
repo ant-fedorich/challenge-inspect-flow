@@ -5,6 +5,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.antonfedorych.inspectflow.domain.model.enum.ItemType
+import com.antonfedorych.inspectflow.ui.common.theme.AppTheme
 import com.antonfedorych.inspectflow.ui.featureInspectionsList.uimodel.InspectionListRow
 import io.kotest.matchers.shouldBe
 import org.junit.Rule
@@ -32,7 +33,9 @@ class InspectionListScreenContentTest {
             ),
         )
         composeRule.setContent {
-            InspectionListScreenContent(state = state, onEvent = { events += it })
+            AppTheme {
+                InspectionListScreenContent(state = state, onEvent = { events += it })
+            }
         }
 
         composeRule.onNodeWithContentDescription("Title").performClick()
