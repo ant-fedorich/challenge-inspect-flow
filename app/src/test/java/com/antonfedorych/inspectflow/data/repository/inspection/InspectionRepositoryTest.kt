@@ -5,7 +5,10 @@ import com.antonfedorych.inspectflow.data.local.InspectionDAO
 import com.antonfedorych.inspectflow.data.local.entity.ItemEntity
 import com.antonfedorych.inspectflow.data.local.entity.ResponseEntity
 import com.antonfedorych.inspectflow.data.local.entity.ResponseSetEntity
+import com.antonfedorych.inspectflow.data.local.relation.ItemWithResponseSet
+import com.antonfedorych.inspectflow.data.mapper.InspectionEntities
 import com.antonfedorych.inspectflow.data.mapper.toEntity
+import com.antonfedorych.inspectflow.data.mapper.toRows
 import com.antonfedorych.inspectflow.data.remote.ApiService
 import com.antonfedorych.inspectflow.data.remote.dto.ItemDto
 import com.antonfedorych.inspectflow.domain.model.PageItem
@@ -55,6 +58,24 @@ class InspectionRepositoryTest {
         repository.observeInspection().first() shouldBe listOf(pageDomain(questionContent = "Cached"))
     }
 
+    @Test
+    fun `T9 - successful refresh should drop rows missing from the new snapshot`() = runTest {
+        val cached = listOf(
+            pageDto(questionContent = "Old"),
+            ItemDto(id = 99, type = "text", content = "Gone"),
+        ).toEntity()
+        dao.insertInspectionTransaction(cached.items, cached.responseSets, cached.responses)
+        api.response = { listOf(pageDto(questionContent = "Fresh")) }
+
+        repository.refreshInspection().test {
+            awaitItem() shouldBe DataResult.Loading
+            awaitItem() shouldBe DataResult.Success(Unit)
+            awaitComplete()
+        }
+
+        repository.observeInspection().first() shouldBe listOf(pageDomain(questionContent = "Fresh"))
+    }
+
     private fun pageDto(questionContent: String) = ItemDto(
         id = 1,
         type = "page",
@@ -75,15 +96,32 @@ private class FakeApiService : ApiService {
     override suspend fun loadInspectionList(): List<ItemDto> = response()
 }
 
-// Same as the Room DAO: inserting a row with an existing id replaces it
+// 🧹 The transaction clears first, so each insert writes into an empty list.
 private class FakeInspectionDAO : InspectionDAO {
     private val items = MutableStateFlow<List<ItemEntity>>(emptyList())
     private val responseSets = MutableStateFlow<List<ResponseSetEntity>>(emptyList())
     private val responses = MutableStateFlow<List<ResponseEntity>>(emptyList())
+    private val rows = MutableStateFlow<List<ItemWithResponseSet>>(emptyList())
 
-    override fun getAllItems(): Flow<List<ItemEntity>> = items
-    override fun getAllResponseSets(): Flow<List<ResponseSetEntity>> = responseSets
-    override fun getAllResponses(): Flow<List<ResponseEntity>> = responses
+    override fun observeItems(): Flow<List<ItemWithResponseSet>> = rows
+
+    override suspend fun insertInspectionTransaction(
+        items: List<ItemEntity>,
+        sets: List<ResponseSetEntity>,
+        responses: List<ResponseEntity>,
+    ) {
+        clearResponses()
+        clearResponseSets()
+        clearItems()
+        insertItems(items)
+        insertResponseSets(sets)
+        insertResponses(responses)
+        rows.value = InspectionEntities(
+            this.items.value,
+            responseSets.value,
+            this.responses.value,
+        ).toRows()
+    }
 
     override suspend fun insertItems(items: List<ItemEntity>) =
         this.items.update { current -> current.replaceBy(items) { it.id } }
@@ -93,6 +131,18 @@ private class FakeInspectionDAO : InspectionDAO {
 
     override suspend fun insertResponses(responses: List<ResponseEntity>) =
         this.responses.update { current -> current.replaceBy(responses) { it.id } }
+
+    override suspend fun clearResponses() {
+        responses.value = emptyList()
+    }
+
+    override suspend fun clearResponseSets() {
+        responseSets.value = emptyList()
+    }
+
+    override suspend fun clearItems() {
+        items.value = emptyList()
+    }
 
     private fun <T> List<T>.replaceBy(new: List<T>, id: (T) -> Int): List<T> {
         val newIds = new.map(id).toSet()

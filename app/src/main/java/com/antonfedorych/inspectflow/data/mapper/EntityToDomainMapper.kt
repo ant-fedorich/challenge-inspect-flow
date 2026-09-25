@@ -1,8 +1,8 @@
 package com.antonfedorych.inspectflow.data.mapper
 
-import com.antonfedorych.inspectflow.data.local.entity.ItemEntity
 import com.antonfedorych.inspectflow.data.local.entity.ResponseEntity
-import com.antonfedorych.inspectflow.data.local.entity.ResponseSetEntity
+import com.antonfedorych.inspectflow.data.local.relation.ItemWithResponseSet
+import com.antonfedorych.inspectflow.data.local.relation.ResponseSetWithResponses
 import com.antonfedorych.inspectflow.domain.model.ChoiceQuestionItem
 import com.antonfedorych.inspectflow.domain.model.ImageQuestionItem
 import com.antonfedorych.inspectflow.domain.model.Item
@@ -12,67 +12,75 @@ import com.antonfedorych.inspectflow.domain.model.ResponseSet
 import com.antonfedorych.inspectflow.domain.model.SectionItem
 import com.antonfedorych.inspectflow.domain.model.TextQuestionItem
 
-fun InspectionEntities.toDomain(): List<Item> =
-    items.toDomainTree(responseSets, responses)
+fun InspectionEntities.toDomain(): List<Item> = toRows().toDomainTree()
 
-fun List<ItemEntity>.toDomainTree(
-    responseSets: List<ResponseSetEntity>,
-    responses: List<ResponseEntity>,
-): List<Item> {
-    fun childrenOf(parentId: Int?): List<ItemEntity> =
-        this.filter { it.parentId == parentId }.sortedBy { it.sortOrder }
+fun InspectionEntities.toRows(): List<ItemWithResponseSet> =
+    items.map { item ->
+        val set = responseSets.find { it.itemId == item.id }
+        ItemWithResponseSet(
+            item = item,
+            responseSet = set?.let { entity ->
+                ResponseSetWithResponses(
+                    responseSet = entity,
+                    responses = responses
+                        .filter { it.responseSetId == entity.id }
+                        .sortedBy { it.id },
+                )
+            },
+        )
+    }
 
-    fun ItemEntity.toDomain(): Item {
-        val childItems = childrenOf(id).map { it.toDomain() }
-        return when (this.type.lowercase()) {
+fun List<ItemWithResponseSet>.toDomainTree(): List<Item> {
+    fun childrenOf(parentId: Int?): List<ItemWithResponseSet> =
+        filter { it.item.parentId == parentId }.sortedBy { it.item.sortOrder }
+
+    fun ItemWithResponseSet.toDomain(): Item {
+        val childItems = childrenOf(item.id).map { it.toDomain() }
+        return when (item.type.lowercase()) {
             "page" -> PageItem(
-                id = id,
-                title = requireNotNull(title) { "page item $id requires title" },
+                id = item.id,
+                title = requireNotNull(item.title) { "page item ${item.id} requires title" },
                 items = childItems,
             )
 
             "section" -> SectionItem(
-                id = id,
-                title = requireNotNull(title) { "section item $id requires title" },
+                id = item.id,
+                title = requireNotNull(item.title) { "section item ${item.id} requires title" },
                 items = childItems,
             )
 
             "text" -> TextQuestionItem(
-                id = id,
-                content = requireNotNull(content) { "text item $id requires content" },
+                id = item.id,
+                content = requireNotNull(item.content) { "text item ${item.id} requires content" },
             )
 
             "image" -> ImageQuestionItem(
-                id = id,
-                title = requireNotNull(title) { "image item $id requires title" },
-                src = requireNotNull(src) { "image item $id requires src" },
+                id = item.id,
+                title = requireNotNull(item.title) { "image item ${item.id} requires title" },
+                src = requireNotNull(item.src) { "image item ${item.id} requires src" },
             )
 
             "choice" -> {
-                val set = responseSets.firstOrNull { it.itemId == id }
-                    ?: error("choice item $id requires response_set")
+                val set = responseSet ?: error("choice item ${item.id} requires response_set")
                 ChoiceQuestionItem(
-                    id = id,
-                    content = requireNotNull(content) { "choice item $id requires content" },
-                    responseSet = set.toDomain(responses),
+                    id = item.id,
+                    content = requireNotNull(item.content) { "choice item ${item.id} requires content" },
+                    responseSet = set.toDomain(),
                 )
             }
 
-            else -> error("Unknown item type '$type' for id $id")
+            else -> error("Unknown item type '${item.type}' for id ${item.id}")
         }
     }
 
     return childrenOf(parentId = null).map { it.toDomain() }
 }
 
-private fun ResponseSetEntity.toDomain(responses: List<ResponseEntity>): ResponseSet =
+private fun ResponseSetWithResponses.toDomain(): ResponseSet =
     ResponseSet(
-        id = id,
-        multipleSelection = multipleSelection,
-        responses = responses
-            .filter { it.responseSetId == id }
-            .sortedBy { it.id }
-            .map { it.toDomain() },
+        id = responseSet.id,
+        multipleSelection = responseSet.multipleSelection,
+        responses = responses.sortedBy { it.id }.map { it.toDomain() },
     )
 
 private fun ResponseEntity.toDomain(): Response =

@@ -10,8 +10,8 @@ import com.antonfedorych.inspectflow.domain.repository.InspectionRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
 import java.io.IOException
 import kotlin.time.Duration.Companion.seconds
@@ -21,17 +21,11 @@ class InspectionRepositoryImpl(
     private val dao: InspectionDAO,
 ) : InspectionRepository {
     override fun observeInspection(): Flow<List<Item>> =
-        combine(
-            dao.getAllItems(),
-            dao.getAllResponseSets(),
-            dao.getAllResponses(),
-        ) { items, sets, responses ->
-            items.toDomainTree(sets, responses)
-        }
+        dao.observeItems().map { it.toDomainTree() }
 
     override fun refreshInspection(): Flow<DataResult<Unit>> = flow {
-        emit(DataResult.Loading)
-        delay(1.seconds) //testing backend delay
+        emit(DataResult.Loading) //Brief pause, so loading data from network is visible (gist responds instantly).
+        delay(1.seconds)
         try {
             val result = apiService.loadInspectionList()
             val entityList = result.toEntity()
