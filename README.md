@@ -7,13 +7,10 @@ Native Android app for the coding challenge: fetch inspection JSON, show hierarc
 3. User can see a reduced-size preview of the image when an image question is presented.
 4. User can open a full-screen view of an image question that shows the full-sized image and its title.
 
-
-
 ## Non-functional requirements
 1. System must support nested sections with endless depth (sections containing sections, without a fixed level limit) for: parsed from API, saved in DB, rendered in Compose.
 2. System must work in offline mode, i.e. save previously fetched data, using relational DB.
-4. (optional) System must handle network failures with providing a fallback mechanism for poor connections
-5. (optional) System must include automated tests for important behavior
+3. (optional) System must handle network failures with providing a fallback mechanism for poor connections
 
 ## Data flow
 ```
@@ -50,6 +47,12 @@ Native Android app for the coding challenge: fetch inspection JSON, show hierarc
   - **domain** — use cases, models, repository interfaces
   - **data** — Retrofit API, Room, repository, implementations
 
+## Testing
+- 8 tests (unit, integration with test doubles, 1 Compose UI test) derived from the requirements above.
+- All run on the JVM, no emulator: `./gradlew testDebugUnitTest`
+- Strategy: [.files/test-strategy.md](.files/test-strategy.md)
+- Scenarios: [.files/test-scenarios.md](.files/test-scenarios.md)
+
 ## Trade-offs
 1. **static JSON URL** — Despite that the "../raw/lumiform-android-test.json" looks like just a file, and logically to use just moshi to parse it in RepoImpl, but in fact, it is the real endpoint like "../users", and it violates boundaries of architecture. So it is better to use with Retrofit as a usual endpoint
 2. Endless depth of nodes in the tree - flatten one table in DB (can handle endless nodes depth) vs nested DB entites like domain models (does not handle endless nodes depth)
@@ -59,8 +62,6 @@ Native Android app for the coding challenge: fetch inspection JSON, show hierarc
 6. Do not cash option selection VS cash option selection
 7. ?Conbine table with Flow conbine() VS not via SQL JOIN, because JOIN would duplicate rows for choice responses i.e. returns dublicated objects to Kotlin.
 
-
-
 ## Risks
 1. Flatten items with depth prop (long scrollable list) for showing nested items in UI - harder to implement collapsing, paginating (depends on a real requirement, amount)
 
@@ -68,4 +69,5 @@ Native Android app for the coding challenge: fetch inspection JSON, show hierarc
 - WorkManager for Retry
 - Collapsing Lists for nested items
 - Observe Internet connection with message
+- ErrorHangling Util to parse exceptions
 
