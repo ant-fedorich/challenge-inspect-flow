@@ -30,6 +30,10 @@ Source for generating tests. Each test name must match the scenario title.
   - When refreshing
   - Then emissions are `Loading` -> `Failure`
   - And `observeInspection()` still emits the cached tree
+3. **T9 - successful refresh should drop rows missing from the new snapshot**
+  - Given cached data that includes a row absent from the next response
+  - When refresh succeeds
+  - Then `observeInspection()` emits only the new tree
 
 ##### FR2 - Choice selection (ViewModel)
 1. **T5 - single selection should replace the previous option**

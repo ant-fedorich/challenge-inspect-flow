@@ -31,13 +31,15 @@ Test scenarios: `test-scenarios.md`.
     - **Test:** T3
   - **Behavior:** Network failure keeps the cached tree
     - **Test:** T4
+  - **Behavior:** A successful refresh drops rows missing from the new snapshot
+    - **Test:** T9
 - NFR3
   - **Behavior:** Network failure keeps the cached tree
     - **Test:** T4
 
 ## Test levels
 - Unit: 2
-- Integration (test doubles): 5
+- Integration (test doubles): 6
 - UI: 1
 
 ## Tooling

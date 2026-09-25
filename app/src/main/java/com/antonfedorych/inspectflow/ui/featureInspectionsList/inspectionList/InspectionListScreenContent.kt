@@ -59,8 +59,7 @@ import com.antonfedorych.inspectflow.domain.model.enum.ItemType.SECTION
 import com.antonfedorych.inspectflow.domain.model.enum.ItemType.TEXT
 import com.antonfedorych.inspectflow.ui.common.theme.AppTheme
 import com.antonfedorych.inspectflow.ui.common.theme.Theme
-
-// TODO: Crash on first loading from api
+import com.antonfedorych.inspectflow.ui.featureInspectionsList.uimodel.ChoiceOptionRow
 
 @Composable
 fun InspectionListScreenContent(
@@ -210,33 +209,13 @@ fun InspectionListScreenContent(
                                         IdBadge(item.id)
                                     }
 
-                                    FlowRow(
-                                        horizontalArrangement = Arrangement.spacedBy(Theme.dimens.inlineSpacing)
-                                    ) {
-                                        item.choiceOptions.forEach { option ->
-                                            FilterChip(
-                                                selected = option.id in selectedOptionIds,
-                                                onClick = {
-                                                    onEvent(
-                                                        InspectionListEvent.ToggleOption(
-                                                            questionId = item.id,
-                                                            optionId = option.id
-                                                        )
-                                                    )
-                                                },
-                                                colors = FilterChipDefaults.filterChipColors(
-                                                    selectedContainerColor = Theme.colorsCustom.chipSelected,
-                                                    selectedLabelColor = Theme.colors.onSurface,
-                                                ),
-                                                label = {
-                                                    Text(text = option.label, style = Theme.typo.labelSmall)
-                                                },
-                                                trailingIcon = {
-                                                    option.score?.let { ScoreBadge(it) }
-                                                }
-                                            )
-                                        }
-                                    }
+                                    ChoiceChips(
+                                        options = item.choiceOptions,
+                                        selectedOptionIds = selectedOptionIds,
+                                        onToggleOption = { optionId ->
+                                            onEvent(InspectionListEvent.ToggleOption(item.id, optionId))
+                                        },
+                                    )
                                     val isSelectedText = if (item.multipleSelection) "multi-select" else "single-select"
 
                                     val selectedText = if (selectedOptionIds.isEmpty()) "none"
@@ -255,6 +234,34 @@ fun InspectionListScreenContent(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ChoiceChips(
+    options: List<ChoiceOptionRow>,
+    selectedOptionIds: Set<Int>,
+    onToggleOption: (optionId: Int) -> Unit,
+) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(Theme.dimens.inlineSpacing)
+    ) {
+        options.forEach { option ->
+            FilterChip(
+                selected = option.id in selectedOptionIds,
+                onClick = { onToggleOption(option.id) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = Theme.colorsCustom.chipSelected,
+                    selectedLabelColor = Theme.colors.onSurface,
+                ),
+                label = {
+                    Text(text = option.label, style = Theme.typo.labelSmall)
+                },
+                trailingIcon = {
+                    option.score?.let { ScoreBadge(it) }
+                },
+            )
         }
     }
 }
