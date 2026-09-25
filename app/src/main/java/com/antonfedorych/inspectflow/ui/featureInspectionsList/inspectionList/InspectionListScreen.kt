@@ -1,8 +1,8 @@
 package com.antonfedorych.inspectflow.ui.featureInspectionsList.inspectionList
 
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.antonfedorych.inspectflow.ui.common.components.ErrorAlertDialog
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -18,54 +19,46 @@ fun InspectionListScreen(
 ) {
     val viewmodel = koinViewModel<InspectionListViewModel>()
     val state = viewmodel.state.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
-    var showSuccess by remember { mutableStateOf(false) }
-
     LaunchedEffect(Unit) {
         viewmodel.effect.collect {
             when (it) {
-                is InspectionListEffect.NavigateToFullscreenImage -> onNavigateToFullscreenImage(it.title, it.imageSrc)
+                is InspectionListEffect.NavigateToFullscreenImage ->
+                    onNavigateToFullscreenImage(it.title, it.imageSrc)
+
                 is InspectionListEffect.ShowError -> {
                     showError = true
                     errorMessage = it.message
                 }
 
                 InspectionListEffect.ShowSuccessRefresh -> {
-                    showSuccess = true
+                    snackbarHostState.showSnackbar(
+                        message = "Data updated!",
+                        actionLabel = "OK",
+                    )
                 }
             }
         }
     }
 
     if (showError) {
-        AlertDialog(
-            onDismissRequest = { showError = false },
-            confirmButton = {
-                TextButton(onClick = { showError = false }) {
-                    Text("OK")
-                }
-            },
-            title = { Text(errorMessage) },
+        ErrorAlertDialog(
+            title = errorMessage,
+            onDismiss = { showError = false },
         )
     }
 
-    if (showSuccess) {
-        AlertDialog(
-            onDismissRequest = { showSuccess = false },
-            confirmButton = {
-                TextButton(onClick = { showSuccess = false }) {
-                    Text("OK")
-                }
-            },
-            title = { Text("Data refresh successfully") },
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+    ) { padding ->
+        InspectionListScreenContent(
+            state = state.value,
+            onEvent = viewmodel::onEvent,
+            scaffoldPadding = padding,
         )
     }
-
-    InspectionListScreenContent(
-        state = state.value,
-        onEvent = viewmodel::onEvent
-    )
 }

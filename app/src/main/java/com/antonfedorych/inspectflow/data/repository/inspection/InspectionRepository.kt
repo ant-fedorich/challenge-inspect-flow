@@ -12,6 +12,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
+import retrofit2.HttpException
+import java.io.IOException
 import kotlin.time.Duration.Companion.seconds
 
 class InspectionRepositoryImpl(
@@ -42,7 +44,13 @@ class InspectionRepositoryImpl(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            emit(DataResult.Failure(e.message.orEmpty()))
+            emit(DataResult.Failure(toErrorMessage(e)))
         }
+    }
+    
+    private fun toErrorMessage(e: Exception): String = when (e) {
+        is IOException -> "Unable to connect. Check your network and try again."
+        is HttpException -> "Unable to load data. Pull to refresh to try again."
+        else -> "Something went wrong. Please try again."
     }
 }

@@ -69,5 +69,5 @@ Native Android app for the coding challenge: fetch inspection JSON, show hierarc
 - WorkManager for Retry
 - Collapsing Lists for nested items
 - Observe Internet connection with message
-- ErrorHangling Util to parse exceptions
+- Rich ErrorHangling Util class to parse exceptions
 

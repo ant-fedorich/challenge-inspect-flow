@@ -22,7 +22,7 @@ object BaseDimens {
 @Immutable
 data class Dimens(
     val screenPaddingHorizontal: Dp = BaseDimens.dp16,
-    val screenPaddingTop: Dp = BaseDimens.dp8,
+    val screenPaddingTop: Dp = BaseDimens.dp16,
     val screenPaddingBottom: Dp = BaseDimens.dp24,
     val depthInset: Dp = BaseDimens.dp20,
     val contentStart: Dp = BaseDimens.dp16,
